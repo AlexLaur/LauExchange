@@ -1,49 +1,86 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/users_roaming/alaurette/Desktop/Documents/WebScocketPyside/client/ui/main.ui'
-#
-# Created: Fri Jun  5 15:03:52 2020
-#      by: pyside2-uic  running on PySide2 2.0.0~alpha0
-#
-# WARNING! All changes made in this file will be lost!
+################################################################################
+## Form generated from reading UI file 'main.ui'
+##
+## Created by: Qt User Interface Compiler version 5.14.1
+##
+## WARNING! All changes made in this file will be lost when recompiling UI file!
+################################################################################
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PySide2.QtCore import (QCoreApplication, QMetaObject, QObject, QPoint,
+    QRect, QSize, QUrl, Qt)
+from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
+    QFontDatabase, QIcon, QLinearGradient, QPalette, QPainter, QPixmap,
+    QRadialGradient)
+from PySide2.QtWidgets import *
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(400, 300)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        self.centralwidget.setObjectName("centralwidget")
-        self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.txe_chat_view = QtWidgets.QTextEdit(self.centralwidget)
+        if MainWindow.objectName():
+            MainWindow.setObjectName(u"MainWindow")
+        MainWindow.resize(578, 468)
+        self.centralwidget = QWidget(MainWindow)
+        self.centralwidget.setObjectName(u"centralwidget")
+        self.verticalLayout = QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.tabWidget = QTabWidget(self.centralwidget)
+        self.tabWidget.setObjectName(u"tabWidget")
+        self.mailbox = QWidget()
+        self.mailbox.setObjectName(u"mailbox")
+        self.verticalLayout_2 = QVBoxLayout(self.mailbox)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.txe_chat_view = QTextEdit(self.mailbox)
+        self.txe_chat_view.setObjectName(u"txe_chat_view")
         self.txe_chat_view.setReadOnly(True)
-        self.txe_chat_view.setObjectName("txe_chat_view")
-        self.verticalLayout.addWidget(self.txe_chat_view)
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.lie_message = QtWidgets.QLineEdit(self.centralwidget)
-        self.lie_message.setObjectName("lie_message")
+
+        self.verticalLayout_2.addWidget(self.txe_chat_view)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout.setSizeConstraint(QLayout.SetMinimumSize)
+        self.lie_message = QLineEdit(self.mailbox)
+        self.lie_message.setObjectName(u"lie_message")
+
         self.horizontalLayout.addWidget(self.lie_message)
-        self.pub_send = QtWidgets.QPushButton(self.centralwidget)
-        self.pub_send.setObjectName("pub_send")
+
+        self.pub_send = QPushButton(self.mailbox)
+        self.pub_send.setObjectName(u"pub_send")
+
         self.horizontalLayout.addWidget(self.pub_send)
-        self.verticalLayout.addLayout(self.horizontalLayout)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout)
+
+        self.tabWidget.addTab(self.mailbox, "")
+        self.outbox = QWidget()
+        self.outbox.setObjectName(u"outbox")
+        self.tabWidget.addTab(self.outbox, "")
+
+        self.verticalLayout.addWidget(self.tabWidget)
+
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 400, 17))
-        self.menubar.setObjectName("menubar")
+        self.menubar = QMenuBar(MainWindow)
+        self.menubar.setObjectName(u"menubar")
+        self.menubar.setGeometry(QRect(0, 0, 578, 21))
         MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
+        self.statusbar = QStatusBar(MainWindow)
+        self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+        self.tabWidget.setCurrentIndex(0)
+
+
+        QMetaObject.connectSlotsByName(MainWindow)
+    # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QtWidgets.QApplication.translate("MainWindow", "MainWindow", None, -1))
-        self.pub_send.setText(QtWidgets.QApplication.translate("MainWindow", "Send", None, -1))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
+        self.pub_send.setText(QCoreApplication.translate("MainWindow", u"Send", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.mailbox), QCoreApplication.translate("MainWindow", u"Mailbox", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.outbox), QCoreApplication.translate("MainWindow", u"Outbox", None))
+    # retranslateUi
 
