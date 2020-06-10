@@ -2,6 +2,7 @@
 import argparse
 import sqlite3
 import signal
+import json
 import os
 from PySide2 import QtCore, QtWebSockets, QtNetwork, QtGui
 from PySide2 import QtWidgets
@@ -16,7 +17,7 @@ SERVER_PATH = os.path.dirname(__file__)
 
 class WebSocketServer(QtCore.QObject):
     def __init__(self, parent, host=None, port=None):
-        super(QtCore.QObject, self).__init__(parent)
+        super(QtCore.QObject, self).__init__() #parent for PySide2 on python 2.7
         # CONSTANTS
         self.clients_dict = {}
         self.client_connection = None
@@ -30,19 +31,19 @@ class WebSocketServer(QtCore.QObject):
                 self.server.serverAddress().toString(),
                 str(self.server.serverPort())))
 
-        self.server.newConnection.connect(self.on_new_connection)
+        self.server.newConnection.connect(self._on_new_connection)
 
         self.db_connection = sqlite3.connect(
             os.path.join(SERVER_PATH, 'db', 'database.db'))
 
-    def on_new_connection(self):
+    def _on_new_connection(self):
         # Get the client
         self.client_connection = self.server.nextPendingConnection()
         self.client_connection.textMessageReceived.connect(
             self.process_text_data)
         self.client_connection.binaryMessageReceived.connect(
             self.process_binary_data)
-        self.client_connection.disconnected.connect(self.socket_disconnected)
+        self.client_connection.disconnected.connect(self._socket_disconnected)
         # Get url parameters
         params = utils.get_params_from_url(
             url=self.client_connection.requestUrl().url())
@@ -58,23 +59,45 @@ class WebSocketServer(QtCore.QObject):
         # Store the current client
         self.clients_dict[user_id] = self.client_connection
 
-    def process_text_data(self, data):
+    def _socket_disconnected(self):
         if self.client_connection:
+            old_client = None
             for user_id, client in self.clients_dict.items():
-                client.sendTextMessage(data)
+                if client != self.client_connection:
+                    continue
+                old_client = user_id
+            self.clients_dict.pop(old_client, None)
+            self.client_connection.deleteLater()
+
+    def process_text_data(self, data):
+        data = json.loads(data)
+        if data['command'] == 'new_message':
+            self.send_message(data=data['data'])
+        elif data['command'] == 'fetch_users':
+            self.fetch_users()
+        elif data['command'] == 'fetch_messages':
+            self.fetch_messages()
 
     def process_binary_data(self, data):
         print("b:", data)
         if self.client_connection:
             self.client_connection.sendBinaryMessage(data)
 
-    def socket_disconnected(self):
+    def fetch_users(self):
+        all_users = models.get_all_users(db_connection=self.db_connection)
+        result = {'command': 'fetch_users', 'result': all_users}
+        if self.client_connection:
+            self.client_connection.sendTextMessage(json.dumps(result))
+
+    def fetch_messages(self):
+        pass
+        # messages = models.get_messages_for_user(db_connection=self.db_connection, user_id=)
+
+    def send_message(self, data):
+        result = {'command': 'new_message', 'result': data}
         if self.client_connection:
             for user_id, client in self.clients_dict.items():
-                if client != self.client_connection:
-                    continue
-                self.clients_dict.pop(user_id, None)
-            self.client_connection.deleteLater()
+                client.sendTextMessage(json.dumps(result))
 
 
 if __name__ == '__main__':

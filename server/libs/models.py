@@ -28,3 +28,10 @@ def get_messages_for_user(db_connection, user_id):
     cursor = db_connection.cursor()
     cursor.execute(req)
     return cursor.fetchall()
+
+
+def get_all_users(db_connection):
+    req = 'SELECT * FROM user'
+    cursor = db_connection.cursor()
+    cursor.execute(req)
+    return cursor.fetchall()
