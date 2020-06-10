@@ -1,0 +1,24 @@
+CREATE TABLE user
+(
+    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_username TEXT
+);
+
+CREATE TABLE message
+(
+    message_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    message_content TEXT,
+    message_sender INTEGER,
+    message_receiver INTEGER,
+    message_attachment TEXT NOT NULL,
+    message_readed INTEGER,
+    message_timestamp INTEGER,
+
+    FOREIGN KEY (message_sender)
+    REFERENCES user(user_id)
+        ON DELETE CASCADE
+
+    FOREIGN KEY (message_receiver)
+    REFERENCES user(user_id)
+        ON DELETE CASCADE
+);
