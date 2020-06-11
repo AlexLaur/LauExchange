@@ -76,7 +76,7 @@ class WebSocketServer(QtCore.QObject):
         elif data['command'] == 'fetch_users':
             self.fetch_users()
         elif data['command'] == 'fetch_messages':
-            self.fetch_messages()
+            self.fetch_messages(user_id=data['user_id'])
 
     def process_binary_data(self, data):
         print("b:", data)
@@ -89,9 +89,12 @@ class WebSocketServer(QtCore.QObject):
         if self.client_connection:
             self.client_connection.sendTextMessage(json.dumps(result))
 
-    def fetch_messages(self):
-        pass
-        # messages = models.get_messages_for_user(db_connection=self.db_connection, user_id=)
+    def fetch_messages(self, user_id):
+        messages = models.get_messages_for_user(
+            db_connection=self.db_connection, user_id=user_id)
+        result = {'command': 'fetch_messages', 'result': messages}
+        if self.client_connection:
+            self.client_connection.sendTextMessage(json.dumps(result))
 
     def send_message(self, data):
         result = {'command': 'new_message', 'result': data}
