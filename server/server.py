@@ -4,6 +4,7 @@ import sqlite3
 import signal
 import json
 import os
+from time import time
 from PySide2 import QtCore, QtWebSockets, QtNetwork, QtGui
 from PySide2 import QtWidgets
 
@@ -72,11 +73,11 @@ class WebSocketServer(QtCore.QObject):
     def process_text_data(self, data):
         data = json.loads(data)
         if data['command'] == 'new_message':
-            self.send_message(data=data['data'])
+            self.new_message(data=data['data'])
         elif data['command'] == 'fetch_users':
             self.fetch_users()
         elif data['command'] == 'fetch_messages':
-            self.fetch_messages(user_id=data['user_id'])
+            self.fetch_messages(user=data['user'])
 
     def process_binary_data(self, data):
         print("b:", data)
@@ -89,12 +90,37 @@ class WebSocketServer(QtCore.QObject):
         if self.client_connection:
             self.client_connection.sendTextMessage(json.dumps(result))
 
-    def fetch_messages(self, user_id):
+    def fetch_messages(self, user):
+        user = models.get_user(db_connection=self.db_connection,
+                               user_username=user)
         messages = models.get_messages_for_user(
-            db_connection=self.db_connection, user_id=user_id)
+            db_connection=self.db_connection, user_id=user[0])
         result = {'command': 'fetch_messages', 'result': messages}
         if self.client_connection:
             self.client_connection.sendTextMessage(json.dumps(result))
+
+    def new_message(self, data):
+        timestamp = int(time()) # only seconds
+        sender = models.get_user(db_connection=self.db_connection,
+                                 user_username=data['sender'])
+        for to in data['receiver']:
+            receiver = to[0]
+            message_id = models.create_message(
+                db_connection=self.db_connection, sender=sender[0],
+                receiver=receiver, content=data['content'],
+                attachment=data['attachment'], timestamp=timestamp)
+            result = {'command': 'new_message',
+                      'result': {
+                          'id': message_id,
+                          'sender': sender[0],
+                          'content': data['content'],
+                          'attachment':data['attachment'],
+                          'timestamp': timestamp,
+                          },
+                      }
+            if self.client_connection:
+                if receiver in self.clients_dict:
+                    self.clients_dict[receiver].sendTextMessage(json.dumps(result))
 
     def send_message(self, data):
         result = {'command': 'new_message', 'result': data}
