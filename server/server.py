@@ -18,7 +18,7 @@ SERVER_PATH = os.path.dirname(__file__)
 
 class WebSocketServer(QtCore.QObject):
     def __init__(self, parent, host=None, port=None):
-        super(QtCore.QObject, self).__init__() #parent for PySide2 on python 2.7
+        super(QtCore.QObject, self).__init__()
         # CONSTANTS
         self.clients_dict = {}
         self.client_connection = None
@@ -78,6 +78,9 @@ class WebSocketServer(QtCore.QObject):
             self.fetch_users()
         elif data['command'] == 'fetch_messages':
             self.fetch_messages(user=data['user'])
+        elif data['command'] == 'message_readed':
+            models.set_message_read(db_connection=self.db_connection,
+                                    message_id=data['message_id'])
 
     def process_binary_data(self, data):
         print("b:", data)

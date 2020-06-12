@@ -29,7 +29,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.setupUi(self)
 
         self.user = getpass.getuser()
-        # self.user = 'alaurette'
+        self.user = 'helloworld'
         self.client_manager = Client(url='%s:%s?user=%s' % (URL, PORT, self.user))
         self.notif_sound = QtMultimedia.QSound(os.path.join(SCRIPT_PATH, 'src', 'notification.wav'))
 
@@ -88,6 +88,11 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
 
 
     def fetch_messages(self, data):
+        unread = len([x for x in data if x[5] != 1])
+        if unread:
+            text = 'Mailbox (%s)' % unread
+            self.tabWidget.setTabText(
+                self.tabWidget.indexOf(self.mailbox), text)
         for message in data:
             message_id = message[0]
             message_content = message[1]
@@ -100,6 +105,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             item = cw.TreeWidgetItem(parent=self.trw_mailbox,
                                      text=[message_sender_username,
                                            str(dt_object)],
+                                     message_id=message_id,
                                      content=message_content,
                                      attachment=message_attachment,
                                      readed=message_readed)
@@ -139,6 +145,12 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
     def show_message_from_mailbox(self, item):
         self.txe_mailbox_content.clear()
         message_content = item.content
+        if not item.readed:
+            item.readed = 1
+            item.setData(0, QtCore.Qt.BackgroundRole, None)
+            command = {'command': 'message_readed',
+                       'message_id': item.message_id}
+            self.client_manager.send_message(message=json.dumps(command))
         self.txe_mailbox_content.setPlainText(message_content)
 
 
