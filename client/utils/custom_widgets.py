@@ -6,7 +6,6 @@ class TreeWidgetItem(QtWidgets.QTreeWidgetItem):
         self.__dict__.update(kwargs)
 
         readed = kwargs.get('readed', 1)
-
         checkable = kwargs.get('checkable', True)
 
         if checkable:

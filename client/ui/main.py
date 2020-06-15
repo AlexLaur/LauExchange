@@ -41,6 +41,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_7.setContentsMargins(0, 0, 0, 0)
         self.trw_mailbox = QTreeWidget(self.verticalLayoutWidget_2)
         self.trw_mailbox.setObjectName(u"trw_mailbox")
+        self.trw_mailbox.setContextMenuPolicy(Qt.CustomContextMenu)
         self.trw_mailbox.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.trw_mailbox.setProperty("showDropIndicator", False)
         self.trw_mailbox.setAlternatingRowColors(True)

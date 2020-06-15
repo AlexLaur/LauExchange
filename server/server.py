@@ -79,10 +79,10 @@ class WebSocketServer(QtCore.QObject):
         elif data['command'] == 'fetch_messages':
             self.fetch_messages(user=data['user'])
         elif data['command'] == 'message_readed':
-            models.set_message_read(db_connection=self.db_connection,
+            models.update_message_read(db_connection=self.db_connection,
                                     message_id=data['message_id'])
         elif data['command'] == 'message_delete':
-            print(data)
+            self.delete_message(data=data['messages'])
 
     def process_binary_data(self, data):
         print("b:", data)
@@ -127,11 +127,12 @@ class WebSocketServer(QtCore.QObject):
                 if receiver in self.clients_dict:
                     self.clients_dict[receiver].sendTextMessage(json.dumps(result))
 
-    def send_message(self, data):
-        result = {'command': 'new_message', 'result': data}
-        if self.client_connection:
-            for user_id, client in self.clients_dict.items():
-                client.sendTextMessage(json.dumps(result))
+
+    def delete_message(self, data):
+        for message_id in data:
+            models.delete_message(db_connection=self.db_connection,
+                                  message_id=message_id)
+
 
 
 if __name__ == '__main__':
@@ -145,7 +146,7 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication([])
     signal.signal(signal.SIGINT, signal.SIG_DFL) # ENABLE CTRL+C to stop
     serverObject = QtWebSockets.QWebSocketServer(
-        'My Socket', QtWebSockets.QWebSocketServer.NonSecureMode)
+        'LauExchange', QtWebSockets.QWebSocketServer.NonSecureMode)
     server = WebSocketServer(serverObject, host=args.host, port=args.port)
     serverObject.closed.connect(app.quit)
     app.exec_()

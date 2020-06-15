@@ -52,8 +52,15 @@ def create_message(db_connection, sender, receiver,
     return cursor.lastrowid
 
 
-def set_message_read(db_connection, message_id):
+def update_message_read(db_connection, message_id):
     req = """UPDATE message SET message_readed=1 WHERE message_id=?"""
+    cursor = db_connection.cursor()
+    cursor.execute(req, (message_id, ))
+    db_connection.commit()
+
+
+def delete_message(db_connection, message_id):
+    req = """DELETE FROM message WHERE message_id IS ?"""
     cursor = db_connection.cursor()
     cursor.execute(req, (message_id, ))
     db_connection.commit()

@@ -36,6 +36,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.pub_send.clicked.connect(self.send_message)
         self.trw_mailbox.itemClicked.connect(self.show_message_from_mailbox)
         self.client_manager.client.textMessageReceived.connect(self._receive_data)
+        self.lie_search_receiver.textChanged.connect(self.search_receiver)
 
         self.trw_mailbox.customContextMenuRequested.connect(self.context_menu_mailbox)
 
@@ -74,6 +75,8 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         data = json.loads(data)
         self.commands[data['command']](data=data['result'])
 
+# CORE METHODS
+
     def fetch_users(self, data):
         """This method get all users and build the list of receiver
 
@@ -90,11 +93,11 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
 
 
     def fetch_messages(self, data):
-        unread = len([x for x in data if x[5] != 1])
-        if unread:
-            text = 'Mailbox (%s)' % unread
-            self.tabWidget.setTabText(
-                self.tabWidget.indexOf(self.mailbox), text)
+        # unread = len([x for x in data if x[5] != 1])
+        # if unread:
+        #     text = 'Mailbox (%s)' % unread
+        #     self.tabWidget.setTabText(
+        #         self.tabWidget.indexOf(self.mailbox), text)
         for message in data:
             message_id = message[0]
             message_content = message[1]
@@ -122,7 +125,6 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         :type data: dict
         """
         if self.hasFocus():
-            print('test')
             self.notif_sound.play()
         dt_object = datetime.fromtimestamp(data['timestamp'])
         item = cw.TreeWidgetItem(parent=self.trw_mailbox,
@@ -135,7 +137,6 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.trw_mailbox.addTopLevelItem(item)
 
 
-
     def send_message(self):
         """This method send a new message
         """
@@ -144,14 +145,15 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         if not to:
             return
         message = self.txe_chat_view.toPlainText()
-        data = {'command': 'new_message',
-                'data': {'sender': self.user,
-                         'content': message,
-                         'attachment':'/test/',
-                         'receiver': to,
-                         },
-                }
-        self._send_data(data=data)
+        command = {'command': 'new_message',
+                   'data': {'sender': self.user,
+                            'content': message,
+                            'attachment':'/test/',
+                            'receiver': to,
+                            },
+                   }
+        self._send_data(data=command)
+        self.clean_up_outbox()
 
 
     def show_message_from_mailbox(self, item):
@@ -162,23 +164,42 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             item.setData(0, QtCore.Qt.BackgroundRole, None)
             command = {'command': 'message_readed',
                        'message_id': item.message_id}
-            self.client_manager.send_message(message=json.dumps(command))
+            self._send_data(data=command)
         self.txe_mailbox_content.setPlainText(message_content)
 
 
     def delete_messages(self):
+        """This method delete messages on the detabase
+        """
         all_messages = utils.get_all_tree_items(tree_widget=self.trw_mailbox)
-        root = self.invisibleRootItem()
         to_delete = []
         for message in all_messages:
             if message.checkState(0) == QtCore.Qt.Checked:
                 to_delete.append(message.message_id)
-                root.removeChild(message)
-        command = {'command': 'message_delete',
-                   'messages': to_delete}
+                self.trw_mailbox.invisibleRootItem().removeChild(message)
+        command = {'command': 'message_delete', 'messages': to_delete}
         if to_delete:
-            self.client_manager.send_message(message=json.dumps(command))
+            self._send_data(data=command)
 
+# UTILS
+
+    def search_receiver(self):
+        """This function is a simple filter for receiver"""
+        filter_text = self.lie_search_receiver.text()
+        items = self.lst_all_receiver.findItems(filter_text, QtCore.Qt.MatchContains)
+
+        all_items = utils.get_all_list_items(list_widget=self.lst_all_receiver)
+        utils.filter_listwidget(all_items=all_items, finding_item=items, text=filter_text)
+
+    def clean_up_outbox(self):
+        """This method clean up the outbox page after a mail.
+        """
+        self.txe_chat_view.clear()
+        all_items = utils.get_all_list_items(list_widget=self.lst_reiciver)
+        for reiciver in all_items:
+            row = self.lst_reiciver.row(reiciver)
+            item = self.lst_reiciver.takeItem(row)
+            self.lst_all_receiver.addItem(item)
 
     def context_menu_mailbox(self, event):
         """This function create a menu when the user right click
