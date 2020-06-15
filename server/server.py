@@ -81,6 +81,8 @@ class WebSocketServer(QtCore.QObject):
         elif data['command'] == 'message_readed':
             models.set_message_read(db_connection=self.db_connection,
                                     message_id=data['message_id'])
+        elif data['command'] == 'message_delete':
+            print(data)
 
     def process_binary_data(self, data):
         print("b:", data)
@@ -115,7 +117,7 @@ class WebSocketServer(QtCore.QObject):
             result = {'command': 'new_message',
                       'result': {
                           'id': message_id,
-                          'sender': sender[0],
+                          'sender': sender,
                           'content': data['content'],
                           'attachment':data['attachment'],
                           'timestamp': timestamp,

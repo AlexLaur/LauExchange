@@ -29,13 +29,15 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.setupUi(self)
 
         self.user = getpass.getuser()
-        self.user = 'helloworld'
+        # self.user = 'helloworld'
         self.client_manager = Client(url='%s:%s?user=%s' % (URL, PORT, self.user))
         self.notif_sound = QtMultimedia.QSound(os.path.join(SCRIPT_PATH, 'src', 'notification.wav'))
 
         self.pub_send.clicked.connect(self.send_message)
         self.trw_mailbox.itemClicked.connect(self.show_message_from_mailbox)
         self.client_manager.client.textMessageReceived.connect(self._receive_data)
+
+        self.trw_mailbox.customContextMenuRequested.connect(self.context_menu_mailbox)
 
         self.commands = {
             'fetch_messages': self.fetch_messages,
@@ -108,7 +110,8 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
                                      message_id=message_id,
                                      content=message_content,
                                      attachment=message_attachment,
-                                     readed=message_readed)
+                                     readed=message_readed,
+                                     checkable=True)
             self.trw_mailbox.addTopLevelItem(item)
 
 
@@ -119,9 +122,18 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         :type data: dict
         """
         if self.hasFocus():
+            print('test')
             self.notif_sound.play()
-        # self.txe_chat_view.append('<b>%s</b>: %s' % (data['author'], data['content']))
-        pprint(data)
+        dt_object = datetime.fromtimestamp(data['timestamp'])
+        item = cw.TreeWidgetItem(parent=self.trw_mailbox,
+                                 text=[data['sender'][1], str(dt_object)],
+                                 message_id=data['id'],
+                                 content=data['content'],
+                                 attachment=data['attachment'],
+                                 readed=0,
+                                 checkable=True)
+        self.trw_mailbox.addTopLevelItem(item)
+
 
 
     def send_message(self):
@@ -152,6 +164,33 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
                        'message_id': item.message_id}
             self.client_manager.send_message(message=json.dumps(command))
         self.txe_mailbox_content.setPlainText(message_content)
+
+
+    def delete_messages(self):
+        all_messages = utils.get_all_tree_items(tree_widget=self.trw_mailbox)
+        root = self.invisibleRootItem()
+        to_delete = []
+        for message in all_messages:
+            if message.checkState(0) == QtCore.Qt.Checked:
+                to_delete.append(message.message_id)
+                root.removeChild(message)
+        command = {'command': 'message_delete',
+                   'messages': to_delete}
+        if to_delete:
+            self.client_manager.send_message(message=json.dumps(command))
+
+
+    def context_menu_mailbox(self, event):
+        """This function create a menu when the user right click
+        on the treewidget bbox assigner
+
+        :param event: event obj
+        :return: None
+        """
+        menu = QtWidgets.QMenu(self.trw_mailbox)
+        delete_selected = menu.addAction('Delete selected messages.')
+        delete_selected.triggered.connect(self.delete_messages)
+        menu.exec_(QtGui.QCursor.pos())
 
 
 if __name__ == "__main__":
