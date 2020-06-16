@@ -1,176 +1,133 @@
 # -*- coding: utf-8 -*-
 
-################################################################################
-## Form generated from reading UI file 'main.ui'
-##
-## Created by: Qt User Interface Compiler version 5.14.1
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
+# Form implementation generated from reading ui file '/users_roaming/alaurette/Documents/LauExchange_v2/client/ui/main.ui'
+#
+# Created: Tue Jun 16 18:26:41 2020
+#      by: pyside2-uic  running on PySide2 2.0.0~alpha0
+#
+# WARNING! All changes made in this file will be lost!
 
-from PySide2.QtCore import (QCoreApplication, QMetaObject, QObject, QPoint,
-    QRect, QSize, QUrl, Qt)
-from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
-    QFontDatabase, QIcon, QLinearGradient, QPalette, QPainter, QPixmap,
-    QRadialGradient)
-from PySide2.QtWidgets import *
-
+from PySide2 import QtCore, QtGui, QtWidgets
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        if MainWindow.objectName():
-            MainWindow.setObjectName(u"MainWindow")
+        MainWindow.setObjectName("MainWindow")
         MainWindow.resize(500, 500)
-        self.centralwidget = QWidget(MainWindow)
-        self.centralwidget.setObjectName(u"centralwidget")
-        self.verticalLayout = QVBoxLayout(self.centralwidget)
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.tabWidget = QTabWidget(self.centralwidget)
-        self.tabWidget.setObjectName(u"tabWidget")
-        self.mailbox = QWidget()
-        self.mailbox.setObjectName(u"mailbox")
-        self.verticalLayout_9 = QVBoxLayout(self.mailbox)
-        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
-        self.splitter_2 = QSplitter(self.mailbox)
-        self.splitter_2.setObjectName(u"splitter_2")
-        self.splitter_2.setOrientation(Qt.Horizontal)
-        self.verticalLayoutWidget_2 = QWidget(self.splitter_2)
-        self.verticalLayoutWidget_2.setObjectName(u"verticalLayoutWidget_2")
-        self.verticalLayout_7 = QVBoxLayout(self.verticalLayoutWidget_2)
-        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
+        self.tabWidget.setObjectName("tabWidget")
+        self.mailbox = QtWidgets.QWidget()
+        self.mailbox.setObjectName("mailbox")
+        self.verticalLayout_9 = QtWidgets.QVBoxLayout(self.mailbox)
+        self.verticalLayout_9.setObjectName("verticalLayout_9")
+        self.splitter_2 = QtWidgets.QSplitter(self.mailbox)
+        self.splitter_2.setOrientation(QtCore.Qt.Horizontal)
+        self.splitter_2.setObjectName("splitter_2")
+        self.verticalLayoutWidget_2 = QtWidgets.QWidget(self.splitter_2)
+        self.verticalLayoutWidget_2.setObjectName("verticalLayoutWidget_2")
+        self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
         self.verticalLayout_7.setContentsMargins(0, 0, 0, 0)
-        self.trw_mailbox = QTreeWidget(self.verticalLayoutWidget_2)
-        self.trw_mailbox.setObjectName(u"trw_mailbox")
-        self.trw_mailbox.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.trw_mailbox.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.verticalLayout_7.setObjectName("verticalLayout_7")
+        self.trw_mailbox = QtWidgets.QTreeWidget(self.verticalLayoutWidget_2)
+        self.trw_mailbox.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.trw_mailbox.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.trw_mailbox.setProperty("showDropIndicator", False)
         self.trw_mailbox.setAlternatingRowColors(True)
         self.trw_mailbox.setItemsExpandable(False)
-
+        self.trw_mailbox.setObjectName("trw_mailbox")
         self.verticalLayout_7.addWidget(self.trw_mailbox)
-
-        self.splitter_2.addWidget(self.verticalLayoutWidget_2)
-        self.verticalLayoutWidget_3 = QWidget(self.splitter_2)
-        self.verticalLayoutWidget_3.setObjectName(u"verticalLayoutWidget_3")
-        self.verticalLayout_8 = QVBoxLayout(self.verticalLayoutWidget_3)
-        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.verticalLayoutWidget_3 = QtWidgets.QWidget(self.splitter_2)
+        self.verticalLayoutWidget_3.setObjectName("verticalLayoutWidget_3")
+        self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_3)
         self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
-        self.txe_mailbox_content = QPlainTextEdit(self.verticalLayoutWidget_3)
-        self.txe_mailbox_content.setObjectName(u"txe_mailbox_content")
+        self.verticalLayout_8.setObjectName("verticalLayout_8")
+        self.txe_mailbox_content = QtWidgets.QPlainTextEdit(self.verticalLayoutWidget_3)
         self.txe_mailbox_content.setReadOnly(True)
-
+        self.txe_mailbox_content.setObjectName("txe_mailbox_content")
         self.verticalLayout_8.addWidget(self.txe_mailbox_content)
-
-        self.pub_import_attachment = QPushButton(self.verticalLayoutWidget_3)
-        self.pub_import_attachment.setObjectName(u"pub_import_attachment")
-
+        self.pub_import_attachment = QtWidgets.QPushButton(self.verticalLayoutWidget_3)
+        self.pub_import_attachment.setObjectName("pub_import_attachment")
         self.verticalLayout_8.addWidget(self.pub_import_attachment)
-
-        self.splitter_2.addWidget(self.verticalLayoutWidget_3)
-
         self.verticalLayout_9.addWidget(self.splitter_2)
-
         self.tabWidget.addTab(self.mailbox, "")
-        self.outbox = QWidget()
-        self.outbox.setObjectName(u"outbox")
-        self.verticalLayout_6 = QVBoxLayout(self.outbox)
-        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.splitter = QSplitter(self.outbox)
-        self.splitter.setObjectName(u"splitter")
-        self.splitter.setOrientation(Qt.Horizontal)
-        self.verticalLayoutWidget = QWidget(self.splitter)
-        self.verticalLayoutWidget.setObjectName(u"verticalLayoutWidget")
-        self.verticalLayout_2 = QVBoxLayout(self.verticalLayoutWidget)
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.outbox = QtWidgets.QWidget()
+        self.outbox.setObjectName("outbox")
+        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.outbox)
+        self.verticalLayout_6.setObjectName("verticalLayout_6")
+        self.splitter = QtWidgets.QSplitter(self.outbox)
+        self.splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.splitter.setObjectName("splitter")
+        self.verticalLayoutWidget = QtWidgets.QWidget(self.splitter)
+        self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.groupBox_3 = QGroupBox(self.verticalLayoutWidget)
-        self.groupBox_3.setObjectName(u"groupBox_3")
-        self.verticalLayout_5 = QVBoxLayout(self.groupBox_3)
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.lie_search_receiver = QLineEdit(self.groupBox_3)
-        self.lie_search_receiver.setObjectName(u"lie_search_receiver")
-
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.groupBox_3 = QtWidgets.QGroupBox(self.verticalLayoutWidget)
+        self.groupBox_3.setObjectName("groupBox_3")
+        self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.groupBox_3)
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.lie_search_receiver = QtWidgets.QLineEdit(self.groupBox_3)
+        self.lie_search_receiver.setObjectName("lie_search_receiver")
         self.verticalLayout_5.addWidget(self.lie_search_receiver)
-
-        self.lst_all_receiver = QListWidget(self.groupBox_3)
-        self.lst_all_receiver.setObjectName(u"lst_all_receiver")
+        self.lst_all_receiver = QtWidgets.QListWidget(self.groupBox_3)
         self.lst_all_receiver.setDragEnabled(True)
-        self.lst_all_receiver.setDragDropMode(QAbstractItemView.DragDrop)
-        self.lst_all_receiver.setDefaultDropAction(Qt.MoveAction)
-
+        self.lst_all_receiver.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.lst_all_receiver.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.lst_all_receiver.setObjectName("lst_all_receiver")
         self.verticalLayout_5.addWidget(self.lst_all_receiver)
-
-
         self.verticalLayout_2.addWidget(self.groupBox_3)
-
-        self.groupBox = QGroupBox(self.verticalLayoutWidget)
-        self.groupBox.setObjectName(u"groupBox")
-        self.verticalLayout_3 = QVBoxLayout(self.groupBox)
-        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.lst_reiciver = QListWidget(self.groupBox)
-        self.lst_reiciver.setObjectName(u"lst_reiciver")
-        self.lst_reiciver.setDragEnabled(True)
-        self.lst_reiciver.setDragDropMode(QAbstractItemView.DragDrop)
-        self.lst_reiciver.setDefaultDropAction(Qt.MoveAction)
-
-        self.verticalLayout_3.addWidget(self.lst_reiciver)
-
-
+        self.groupBox = QtWidgets.QGroupBox(self.verticalLayoutWidget)
+        self.groupBox.setObjectName("groupBox")
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.groupBox)
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.lst_receiver = QtWidgets.QListWidget(self.groupBox)
+        self.lst_receiver.setDragEnabled(True)
+        self.lst_receiver.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.lst_receiver.setDefaultDropAction(QtCore.Qt.MoveAction)
+        self.lst_receiver.setObjectName("lst_receiver")
+        self.verticalLayout_3.addWidget(self.lst_receiver)
         self.verticalLayout_2.addWidget(self.groupBox)
-
-        self.splitter.addWidget(self.verticalLayoutWidget)
-        self.groupBox_2 = QGroupBox(self.splitter)
-        self.groupBox_2.setObjectName(u"groupBox_2")
-        self.verticalLayout_4 = QVBoxLayout(self.groupBox_2)
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.txe_chat_view = QTextEdit(self.groupBox_2)
-        self.txe_chat_view.setObjectName(u"txe_chat_view")
+        self.groupBox_2 = QtWidgets.QGroupBox(self.splitter)
+        self.groupBox_2.setObjectName("groupBox_2")
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.groupBox_2)
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.txe_chat_view = QtWidgets.QTextEdit(self.groupBox_2)
         self.txe_chat_view.setReadOnly(False)
-
+        self.txe_chat_view.setObjectName("txe_chat_view")
         self.verticalLayout_4.addWidget(self.txe_chat_view)
-
-        self.pub_send = QPushButton(self.groupBox_2)
-        self.pub_send.setObjectName(u"pub_send")
-
+        self.pub_send = QtWidgets.QPushButton(self.groupBox_2)
+        self.pub_send.setObjectName("pub_send")
         self.verticalLayout_4.addWidget(self.pub_send)
-
-        self.splitter.addWidget(self.groupBox_2)
-
         self.verticalLayout_6.addWidget(self.splitter)
-
         self.tabWidget.addTab(self.outbox, "")
-
         self.verticalLayout.addWidget(self.tabWidget)
-
         MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QMenuBar(MainWindow)
-        self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 500, 21))
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 500, 17))
+        self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QStatusBar(MainWindow)
-        self.statusbar.setObjectName(u"statusbar")
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-
         self.tabWidget.setCurrentIndex(0)
-
-
-        QMetaObject.connectSlotsByName(MainWindow)
-    # setupUi
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"LauExchange", None))
-        ___qtreewidgetitem = self.trw_mailbox.headerItem()
-        ___qtreewidgetitem.setText(1, QCoreApplication.translate("MainWindow", u"Date", None));
-        ___qtreewidgetitem.setText(0, QCoreApplication.translate("MainWindow", u"From", None));
-        self.pub_import_attachment.setText(QCoreApplication.translate("MainWindow", u"Import attachment", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.mailbox), QCoreApplication.translate("MainWindow", u"Mailbox", None))
-        self.groupBox_3.setTitle(QCoreApplication.translate("MainWindow", u"All reiciver", None))
-        self.lie_search_receiver.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search Someone", None))
-        self.groupBox.setTitle(QCoreApplication.translate("MainWindow", u"To", None))
-        self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"Message", None))
-        self.pub_send.setText(QCoreApplication.translate("MainWindow", u"Send", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.outbox), QCoreApplication.translate("MainWindow", u"Outbox", None))
-    # retranslateUi
+        MainWindow.setWindowTitle(QtWidgets.QApplication.translate("MainWindow", "LauExchange", None, -1))
+        self.trw_mailbox.setSortingEnabled(True)
+        self.trw_mailbox.headerItem().setText(0, QtWidgets.QApplication.translate("MainWindow", "From", None, -1))
+        self.trw_mailbox.headerItem().setText(1, QtWidgets.QApplication.translate("MainWindow", "Date", None, -1))
+        self.pub_import_attachment.setText(QtWidgets.QApplication.translate("MainWindow", "Import attachment", None, -1))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.mailbox), QtWidgets.QApplication.translate("MainWindow", "Mailbox", None, -1))
+        self.groupBox_3.setTitle(QtWidgets.QApplication.translate("MainWindow", "All reiciver", None, -1))
+        self.lie_search_receiver.setPlaceholderText(QtWidgets.QApplication.translate("MainWindow", "Search Someone", None, -1))
+        self.groupBox.setTitle(QtWidgets.QApplication.translate("MainWindow", "To", None, -1))
+        self.groupBox_2.setTitle(QtWidgets.QApplication.translate("MainWindow", "Message", None, -1))
+        self.pub_send.setText(QtWidgets.QApplication.translate("MainWindow", "Send", None, -1))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.outbox), QtWidgets.QApplication.translate("MainWindow", "Outbox", None, -1))
 

@@ -1,0 +1,22 @@
+/* Style general */
+*{
+    font-size:12px;
+    font-family: 'Cantarell';
+    font-style: 'Normal';
+    /* font-weight: bold; */
+}
+
+/* Style for elements */
+QImage{
+    max-height:50px;
+}
+
+QTreeWidget::item{
+    padding: 5px;
+}
+QTreeWidget::item:hover, QTreeWidget::item:selected{
+    padding: 0px;
+}
+/* QTreeWidget::branch{
+    background-color: rgb(60, 60, 60);
+} */

@@ -1,3 +1,18 @@
+import os
+
+def load_style_sheet(script_path=None):
+    """This function load the style sheet
+
+    :param script_path: The path of the app, defaults to None
+    :type script_path: str, optional
+    :return: The style content
+    :rtype: str
+    """
+    style = open(os.path.join(script_path, 'style/style.qss')).read()
+    style = style.replace('@res', script_path)
+    return style
+
+
 def get_all_list_items(list_widget):
     items = []
     for index in range(list_widget.count()):

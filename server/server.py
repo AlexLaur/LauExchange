@@ -59,6 +59,8 @@ class WebSocketServer(QtCore.QObject):
             user_id = user_db[0]
         # Store the current client
         self.clients_dict[user_id] = self.client_connection
+        command = {'command': 'connection', 'result': True}
+        self.client_connection.sendTextMessage(json.dumps(command))
 
     def _socket_disconnected(self):
         if self.client_connection:
@@ -80,7 +82,7 @@ class WebSocketServer(QtCore.QObject):
             self.fetch_messages(user=data['user'])
         elif data['command'] == 'message_readed':
             models.update_message_read(db_connection=self.db_connection,
-                                    message_id=data['message_id'])
+                                       message_id=data['message_id'])
         elif data['command'] == 'message_delete':
             self.delete_message(data=data['messages'])
 
