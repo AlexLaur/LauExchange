@@ -1,5 +1,6 @@
 from PySide2 import QtCore, QtGui, QtWidgets
 import view
+reload(view)
 
 def run_nuke():
     app = QtWidgets.QApplication.instance()
@@ -9,7 +10,7 @@ def run_nuke():
                 return widget
     main_window = getMainWindow()
 
-    window = view.MainWindow(main_window)
+    window = view.MainWindow(main_window, software='nuke')
     window.show()
 
 
@@ -18,9 +19,9 @@ def run_maya():
     import view
 
     class LauExchange(mayaMixin.MayaQWidgetBaseMixin, view.MainWindow):
-        def __init__(self, parent=None):
-            super(LauExchange, self).__init__()
+        def __init__(self, parent=None, software=None):
+            super(LauExchange, self).__init__(software=software)
 
-    window = LauExchange()
+    window = LauExchange(software='maya')
     window.show()
 

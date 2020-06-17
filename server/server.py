@@ -59,8 +59,10 @@ class WebSocketServer(QtCore.QObject):
             user_id = user_db[0]
         # Store the current client
         self.clients_dict[user_id] = self.client_connection
-        command = {'command': 'connection', 'result': True}
-        self.client_connection.sendTextMessage(json.dumps(command))
+
+        # Init the app by sending all users and last messages
+        self.fetch_users()
+        self.fetch_messages(user=client_user)
 
     def _socket_disconnected(self):
         if self.client_connection:

@@ -2,6 +2,7 @@
 import os
 import json
 import getpass
+import importlib
 from datetime import datetime
 from pprint import pprint
 from PySide2 import QtCore
@@ -22,20 +23,24 @@ SCRIPT_PATH = os.path.dirname(__file__)
 
 URL = '127.0.0.1'
 PORT = 1302
+PATH_ATTACHMENT = '/users_roaming/alaurette/Documents/TESTS/attachements/'
 
 class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, software=None):
         super(MainWindow, self).__init__(parent=parent)
         self.setupUi(self)
 
         # CONSTANTS
         self.user = getpass.getuser()
+        self.software = software
+        if self.software:
+            mod = '.softs.%s.attachment' % self.software
+            self.attachment_module = importlib.import_module(mod, 'client')
         # self.user = 'helloworld'
         # self.notif_sound = QtMultimedia.QSound(
         #     os.path.join(SCRIPT_PATH, 'src', 'notification.wav'))
 
         self.commands = {
-            'connection': self._init_app,
             'fetch_messages': self.fetch_messages,
             'fetch_users': self.fetch_users,
             'new_message': self.new_message,
@@ -62,6 +67,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.client_manager.client.textMessageReceived.connect(
             self._receive_data)
 
+        self.pub_import_attachment.clicked.connect(self.import_attachment)
         self.pub_send.clicked.connect(self.send_message)
         self.lie_search_receiver.textChanged.connect(self.search_receiver)
         self.trw_mailbox.itemClicked.connect(self.show_message_from_mailbox)
@@ -86,16 +92,6 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         data = json.loads(data)
         self.commands[data['command']](data=data['result'])
 
-    def _init_app(self, data):
-        """This method init the app when the connection with the server is
-        ready. It send commands in order to get all the users and last messages
-
-        :param data: The data from the server for the connection
-        :type data: bool
-        """
-        self._send_data(data={'command': 'fetch_users'})
-        self._send_data(data={'command': 'fetch_messages', 'user': self.user})
-
 # RECEIVE FROM SERVER
 
     def fetch_users(self, data):
@@ -113,11 +109,6 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             self.lst_all_receiver.addItem(item)
 
     def fetch_messages(self, data):
-        # unread = len([x for x in data if x[5] != 1])
-        # if unread:
-        #     text = 'Mailbox (%s)' % unread
-        #     self.tabWidget.setTabText(
-        #         self.tabWidget.indexOf(self.mailbox), text)
         for message in data:
             message_id = message[0]
             message_content = message[1]
@@ -136,6 +127,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
                                      readed=message_readed,
                                      checkable=True)
             self.trw_mailbox.addTopLevelItem(item)
+        self.eval_mailbox()
 
 
     def new_message(self, data):
@@ -165,9 +157,10 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         to = [item.data(32) for item in receivers]
         if not to:
             return
+        attachement = self.generate_attachment()
         data = {'sender': self.user,
                 'content': self.txe_chat_view.toPlainText(),
-                'attachment':'/test/',
+                'attachment':attachement,
                 'receiver': to,
                 }
         command = {'command': 'new_message', 'data': data}
@@ -184,6 +177,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
                        'message_id': item.message_id}
             self._send_data(data=command)
         self.txe_mailbox_content.setPlainText(message_content)
+        self.eval_mailbox()
 
     def delete_messages(self):
         """This method delete messages on the detabase"""
@@ -197,7 +191,38 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         if to_delete:
             self._send_data(data=command)
 
+    def import_attachment(self):
+        """This method import the attachment into the software
+
+        :return: The path of the attachment
+        :rtype: str or None
+        """
+        if self.software:
+            item = self.trw_mailbox.currentItem()
+            return self.attachment_module.run_import(path=item.attachment)
+        return None
+
+    def generate_attachment(self):
+        """This method export the attachment from the software
+
+        :return: The path of the attachment
+        :rtype: str or None
+        """
+        if self.software:
+            return self.attachment_module.run_export(path=PATH_ATTACHMENT)
+        return None
+
 # UTILS
+
+    def eval_mailbox(self):
+        """This method eval the number of unread messages and update the text
+        on the the tab"""
+        all_messages = utils.get_all_tree_items(tree_widget=self.trw_mailbox)
+        unread = len([x for x in all_messages if x.readed != 1])
+        if unread:
+            text = 'Mailbox (%s)' % unread
+            self.tabWidget.setTabText(
+                self.tabWidget.indexOf(self.mailbox), text)
 
     def search_receiver(self):
         """This function is a simple filter for receiver"""
