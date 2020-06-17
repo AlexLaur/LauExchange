@@ -47,7 +47,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         }
 
         # CLIENT
-        url = '%s:%s?user=%s' % (URL, PORT, self.user)
+        url = '%s:%s?user=%s&soft=%s' % (URL, PORT, self.user, self.software)
         self.client_manager = Client(url=url)
 
         # MAILBOX HEADER
@@ -109,23 +109,22 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             self.lst_all_receiver.addItem(item)
 
     def fetch_messages(self, data):
+        """This method fetch last messages from the server for the current user
+        The data will be a list of list.
+
+        >>> [[message_id, message_content, message_sender_id,
+        ...   message_receiver_id, message_attachment, message_readed,
+        ...   message_timestamp, message_sender_id, message_sender_username]]
+
+        :param data: The data from the server
+        :type data: list
+        """
         for message in data:
-            message_id = message[0]
-            message_content = message[1]
-            message_sender_id = message[7]
-            message_sender_username = message[8]
-            message_attachment = message[4]
-            message_readed = message[5]
-            message_timestamp = message[6]
-            dt_object = datetime.fromtimestamp(message_timestamp)
-            item = cw.TreeWidgetItem(parent=self.trw_mailbox,
-                                     text=[message_sender_username,
-                                           str(dt_object)],
-                                     message_id=message_id,
-                                     content=message_content,
-                                     attachment=message_attachment,
-                                     readed=message_readed,
-                                     checkable=True)
+            dt_object = datetime.fromtimestamp(message[6])
+            item = cw.TreeWidgetItem(
+                parent=self.trw_mailbox, text=[message[8], str(dt_object)],
+                message_id=message[0], content= message[1],
+                attachment=message[4], readed=message[5], checkable=True)
             self.trw_mailbox.addTopLevelItem(item)
         self.eval_mailbox()
 
@@ -140,24 +139,23 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             pass
             # self.notif_sound.play()
         dt_object = datetime.fromtimestamp(data['timestamp'])
-        item = cw.TreeWidgetItem(parent=self.trw_mailbox,
-                                 text=[data['sender'][1], str(dt_object)],
-                                 message_id=data['id'],
-                                 content=data['content'],
-                                 attachment=data['attachment'],
-                                 readed=0,
-                                 checkable=True)
+        item = cw.TreeWidgetItem(
+            parent=self.trw_mailbox, text=[data['sender'][1], str(dt_object)],
+            message_id=data['id'], content=data['content'],
+            attachment=data['attachment'], readed=0, checkable=True)
         self.trw_mailbox.addTopLevelItem(item)
 
 # EMIT TO SERVER
 
     def send_message(self):
         """This method send a new message"""
+        attachement = self.generate_attachment()
+        if not attachement:
+            return
         receivers = utils.get_all_list_items(list_widget=self.lst_receiver)
         to = [item.data(32) for item in receivers]
         if not to:
             return
-        attachement = self.generate_attachment()
         data = {'sender': self.user,
                 'content': self.txe_chat_view.toPlainText(),
                 'attachment':attachement,
@@ -168,12 +166,17 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         self.clean_up_outbox()
 
     def show_message_from_mailbox(self, item):
+        """This methid is called when the user click on the item in the mailbox
+
+        :param item: The current selected item
+        :type item: custom_widgets.TreeWidgetItem object
+        """
         self.txe_mailbox_content.clear()
         message_content = item.content
         if not item.readed:
             item.readed = 1
             # item.setData(0, QtCore.Qt.BackgroundRole, None)
-            command = {'command': 'message_readed',
+            command = {'command': 'read_message',
                        'message_id': item.message_id}
             self._send_data(data=command)
         self.txe_mailbox_content.setPlainText(message_content)
@@ -187,7 +190,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
             if message.checkState(0) == QtCore.Qt.Checked:
                 to_delete.append(message.message_id)
                 self.trw_mailbox.invisibleRootItem().removeChild(message)
-        command = {'command': 'message_delete', 'messages': to_delete}
+        command = {'command': 'delete_message', 'messages': to_delete}
         if to_delete:
             self._send_data(data=command)
 

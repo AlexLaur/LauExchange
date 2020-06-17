@@ -11,7 +11,7 @@ def run_import(path=None):
     :return: The path of the file
     :rtype: str
     """
-    return None
+    return nuke.nodePaste(path)
 
 
 def run_export(path=None):
@@ -22,5 +22,4 @@ def run_export(path=None):
     :return: The file created
     :rtype: str
     """
-    filename = str(uuid1())
-    return None
+    return nuke.nodeCopy(os.path.join(path, '%s.nk' % str(uuid1())))

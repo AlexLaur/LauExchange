@@ -22,7 +22,10 @@ class WebSocketServer(QtCore.QObject):
         # CONSTANTS
         self.clients_dict = {}
         self.client_connection = None
-
+        # DATABASE
+        self.db_connection = sqlite3.connect(
+            os.path.join(SERVER_PATH, 'db', 'database.db'))
+        # SERVER
         self.server = QtWebSockets.QWebSocketServer(parent.serverName(),
                                                     parent.secureMode(),
                                                     parent)
@@ -31,24 +34,23 @@ class WebSocketServer(QtCore.QObject):
                 self.server.serverName(),
                 self.server.serverAddress().toString(),
                 str(self.server.serverPort())))
-
+        # SIGNALS
         self.server.newConnection.connect(self._on_new_connection)
 
-        self.db_connection = sqlite3.connect(
-            os.path.join(SERVER_PATH, 'db', 'database.db'))
-
     def _on_new_connection(self):
+        """This method is called when a new socket is connected to the server
+        """
         # Get the client
         self.client_connection = self.server.nextPendingConnection()
         self.client_connection.textMessageReceived.connect(
             self.process_text_data)
-        self.client_connection.binaryMessageReceived.connect(
-            self.process_binary_data)
         self.client_connection.disconnected.connect(self._socket_disconnected)
         # Get url parameters
         params = utils.get_params_from_url(
             url=self.client_connection.requestUrl().url())
-        client_user = params['user'][0]
+        client_user = params['user']
+        software_user = params['soft']
+        print(software_user)
         # Retrieve user in the database
         user_db = models.get_user(
             db_connection=self.db_connection, user_username=client_user)
@@ -59,12 +61,12 @@ class WebSocketServer(QtCore.QObject):
             user_id = user_db[0]
         # Store the current client
         self.clients_dict[user_id] = self.client_connection
-
         # Init the app by sending all users and last messages
         self.fetch_users()
         self.fetch_messages(user=client_user)
 
     def _socket_disconnected(self):
+        """This method is called when the socket disconected to the server"""
         if self.client_connection:
             old_client = None
             for user_id, client in self.clients_dict.items():
@@ -74,7 +76,22 @@ class WebSocketServer(QtCore.QObject):
             self.clients_dict.pop(old_client, None)
             self.client_connection.deleteLater()
 
+    def _send_data(self, client, data):
+        """This private method send data to the socket
+
+        :param data: The data to send
+        :type data: dict
+        """
+        client.sendTextMessage(json.dumps(data))
+
     def process_text_data(self, data):
+        """This method get all commands from the socket and call rights methods
+        to do the job. The incomming data is str type. A simple json.loads()
+        transform this data into a dict which can be used.
+
+        :param data: The command from the socket, and the attached data
+        :type data: str
+        """
         data = json.loads(data)
         if data['command'] == 'new_message':
             self.new_message(data=data['data'])
@@ -82,61 +99,73 @@ class WebSocketServer(QtCore.QObject):
             self.fetch_users()
         elif data['command'] == 'fetch_messages':
             self.fetch_messages(user=data['user'])
-        elif data['command'] == 'message_readed':
+        elif data['command'] == 'read_message':
             models.update_message_read(db_connection=self.db_connection,
                                        message_id=data['message_id'])
-        elif data['command'] == 'message_delete':
+        elif data['command'] == 'delete_message':
             self.delete_message(data=data['messages'])
 
-    def process_binary_data(self, data):
-        print("b:", data)
-        if self.client_connection:
-            self.client_connection.sendBinaryMessage(data)
-
     def fetch_users(self):
+        """This method is called by the command 'fetch_users'. It return all
+        users in the database"""
         all_users = models.get_all_users(db_connection=self.db_connection)
         result = {'command': 'fetch_users', 'result': all_users}
         if self.client_connection:
-            self.client_connection.sendTextMessage(json.dumps(result))
+            self._send_data(client=self.client_connection, data=result)
 
     def fetch_messages(self, user):
+        """This method is called by the command 'fetch_messages'. It get last
+        10 messages in the database and send them to the user
+
+        :param user: The user who is the receiver
+        :type user: list
+        """
         user = models.get_user(db_connection=self.db_connection,
                                user_username=user)
         messages = models.get_messages_for_user(
             db_connection=self.db_connection, user_id=user[0])
         result = {'command': 'fetch_messages', 'result': messages}
         if self.client_connection:
-            self.client_connection.sendTextMessage(json.dumps(result))
+            self._send_data(client=self.client_connection, data=result)
 
     def new_message(self, data):
+        """This method is called by the command 'new_message'. It create a new
+        message on the database and dispatch this messages to all connected
+        receivers.
+
+        :param data: The data for the message
+        :type data: dict
+        """
         timestamp = int(time()) # only seconds
         sender = models.get_user(db_connection=self.db_connection,
                                  user_username=data['sender'])
         for to in data['receiver']:
-            receiver = to[0]
+            receiver = to[0] # User ID
             message_id = models.create_message(
                 db_connection=self.db_connection, sender=sender[0],
                 receiver=receiver, content=data['content'],
                 attachment=data['attachment'], timestamp=timestamp)
-            result = {'command': 'new_message',
-                      'result': {
-                          'id': message_id,
-                          'sender': sender,
-                          'content': data['content'],
-                          'attachment':data['attachment'],
-                          'timestamp': timestamp,
-                          },
-                      }
+            data = {'id': message_id, 'sender': sender,
+                    'content': data['content'],
+                    'attachment':data['attachment'],
+                    'timestamp': timestamp,
+                    }
+            result = {'command': 'new_message', 'result': data}
             if self.client_connection:
                 if receiver in self.clients_dict:
-                    self.clients_dict[receiver].sendTextMessage(json.dumps(result))
-
+                    self._send_data(client=self.clients_dict[receiver],
+                                    data=result)
 
     def delete_message(self, data):
-        for message_id in data:
-            models.delete_message(db_connection=self.db_connection,
-                                  message_id=message_id)
+        """This method is called by the command 'delete_message'
+        and it delete the given messages in the database
 
+        :param data: The messages id
+        :type data: list
+        """
+        for message_id in data:
+            models.delete_message(
+                db_connection=self.db_connection, message_id=message_id)
 
 
 if __name__ == '__main__':
