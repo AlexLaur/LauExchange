@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-__maintainer__ = "Alexandre Laurette"
-__email__ = "alexandre.laurette@fixstudio.com"
-
 from PySide2 import QtCore, QtWebSockets, QtNetwork
 
+__maintainer__ = "Alexandre Laurette"
 
 class Client(QtCore.QObject):
     def __init__(self, parent=None, url=None):

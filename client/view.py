@@ -17,7 +17,6 @@ from utils import utils
 from ui import main as main_ui
 
 __maintainer__ = "Alexandre Laurette"
-__email__ = "laurette.alexandre@gmail.com"
 
 SCRIPT_PATH = os.path.dirname(__file__)
 

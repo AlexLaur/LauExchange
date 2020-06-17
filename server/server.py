@@ -12,7 +12,6 @@ from libs import utils
 from libs import models
 
 __maintainer__ = 'Alexandre Laurette'
-__email__ = 'alexandre.laurette@fixstudio.com'
 
 SERVER_PATH = os.path.dirname(__file__)
 
