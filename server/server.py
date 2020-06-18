@@ -59,19 +59,19 @@ class WebSocketServer(QtCore.QObject):
         else:
             user_id = user_db[0]
         # Store the current client
-        self.clients_dict[user_id] = self.client_connection
+        self.clients_dict[(user_id, software_user)] = self.client_connection
         # Init the app by sending all users and last messages
         self.fetch_users()
-        self.fetch_messages(user=client_user)
+        self.fetch_messages(user=client_user, software=software_user)
 
     def _socket_disconnected(self):
         """This method is called when the socket disconected to the server"""
         if self.client_connection:
             old_client = None
-            for user_id, client in self.clients_dict.items():
+            for user_infos, client in self.clients_dict.items():
                 if client != self.client_connection:
                     continue
-                old_client = user_id
+                old_client = user_infos
             self.clients_dict.pop(old_client, None)
             self.client_connection.deleteLater()
 
@@ -94,10 +94,6 @@ class WebSocketServer(QtCore.QObject):
         data = json.loads(data)
         if data['command'] == 'new_message':
             self.new_message(data=data['data'])
-        elif data['command'] == 'fetch_users':
-            self.fetch_users()
-        elif data['command'] == 'fetch_messages':
-            self.fetch_messages(user=data['user'])
         elif data['command'] == 'read_message':
             models.update_message_read(db_connection=self.db_connection,
                                        message_id=data['message_id'])
@@ -112,17 +108,20 @@ class WebSocketServer(QtCore.QObject):
         if self.client_connection:
             self._send_data(client=self.client_connection, data=result)
 
-    def fetch_messages(self, user):
-        """This method is called by the command 'fetch_messages'. It get last
-        10 messages in the database and send them to the user
+    def fetch_messages(self, user, software):
+        """This method is called by the command 'fetch_messages'.
+        It get last 10 messages in the database and send them to the user
 
         :param user: The user who is the receiver
         :type user: list
+        :param software: The software of the user in order to redirect messages
+        :type software: str
         """
         user = models.get_user(db_connection=self.db_connection,
                                user_username=user)
         messages = models.get_messages_for_user(
-            db_connection=self.db_connection, user_id=user[0])
+            db_connection=self.db_connection, user_id=user[0],
+            software=software)
         result = {'command': 'fetch_messages', 'result': messages}
         if self.client_connection:
             self._send_data(client=self.client_connection, data=result)
@@ -143,17 +142,20 @@ class WebSocketServer(QtCore.QObject):
             message_id = models.create_message(
                 db_connection=self.db_connection, sender=sender[0],
                 receiver=receiver, content=data['content'],
-                attachment=data['attachment'], timestamp=timestamp)
+                attachment=data['attachment'], software=data['software'],
+                timestamp=timestamp)
             data = {'id': message_id, 'sender': sender,
                     'content': data['content'],
-                    'attachment':data['attachment'],
+                    'attachment': data['attachment'],
+                    'software': data['software'],
                     'timestamp': timestamp,
                     }
             result = {'command': 'new_message', 'result': data}
             if self.client_connection:
-                if receiver in self.clients_dict:
-                    self._send_data(client=self.clients_dict[receiver],
-                                    data=result)
+                if (receiver, data['software']) in self.clients_dict:
+                    self._send_data(
+                        client=self.clients_dict[(receiver, data['software'])],
+                        data=result)
 
     def delete_message(self, data):
         """This method is called by the command 'delete_message'

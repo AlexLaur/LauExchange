@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/users_roaming/alaurette/Documents/LauExchange_v2/client/ui/main.ui'
+# Form implementation generated from reading ui file '/users_roaming/alaurette/Desktop/Documents/LauExchange_v2/client/ui/main.ui'
 #
-# Created: Tue Jun 16 18:26:41 2020
+# Created: Thu Jun 18 11:22:47 2020
 #      by: pyside2-uic  running on PySide2 2.0.0~alpha0
 #
 # WARNING! All changes made in this file will be lost!
@@ -108,10 +108,17 @@ class Ui_MainWindow(object):
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 500, 17))
         self.menubar.setObjectName("menubar")
+        self.menuOptions = QtWidgets.QMenu(self.menubar)
+        self.menuOptions.setObjectName("menuOptions")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.action_enable_notification = QtWidgets.QAction(MainWindow)
+        self.action_enable_notification.setCheckable(True)
+        self.action_enable_notification.setObjectName("action_enable_notification")
+        self.menuOptions.addAction(self.action_enable_notification)
+        self.menubar.addAction(self.menuOptions.menuAction())
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
@@ -130,4 +137,6 @@ class Ui_MainWindow(object):
         self.groupBox_2.setTitle(QtWidgets.QApplication.translate("MainWindow", "Message", None, -1))
         self.pub_send.setText(QtWidgets.QApplication.translate("MainWindow", "Send", None, -1))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.outbox), QtWidgets.QApplication.translate("MainWindow", "Outbox", None, -1))
+        self.menuOptions.setTitle(QtWidgets.QApplication.translate("MainWindow", "Options", None, -1))
+        self.action_enable_notification.setText(QtWidgets.QApplication.translate("MainWindow", "Enable notification", None, -1))
 

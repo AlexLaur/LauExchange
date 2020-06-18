@@ -23,13 +23,13 @@ def get_messages_from_user(db_connection, user_id):
     return cursor.fetchall()
 
 
-def get_messages_for_user(db_connection, user_id):
+def get_messages_for_user(db_connection, user_id, software):
     req = """SELECT * FROM message
     INNER JOIN user ON message.message_sender=user.user_id
-    WHERE message_receiver=?
+    WHERE message_receiver=? AND message_software=?
     ORDER BY message_timestamp DESC, message_readed ASC LIMIT 10"""
     cursor = db_connection.cursor()
-    cursor.execute(req, (user_id, ))
+    cursor.execute(req, (user_id, software))
     return cursor.fetchall()
 
 
@@ -41,11 +41,11 @@ def get_all_users(db_connection):
 
 
 def create_message(db_connection, sender, receiver,
-                   content, attachment, timestamp):
+                   content, attachment, software, timestamp):
     req =  """INSERT INTO message (message_sender, message_receiver,
-    message_content, message_attachment, message_timestamp)
-    VALUES (?, ?, ?, ?, ?)"""
-    params = (sender, receiver, content, attachment, timestamp)
+    message_content, message_attachment, message_software, message_timestamp)
+    VALUES (?, ?, ?, ?, ?, ?)"""
+    params = (sender, receiver, content, attachment, software, timestamp)
     cursor = db_connection.cursor()
     cursor.execute(req, params)
     db_connection.commit()

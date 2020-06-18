@@ -9,7 +9,6 @@ from PySide2 import QtCore
 from PySide2 import QtGui
 from PySide2 import QtWidgets
 from PySide2 import QtMultimedia
-from PySide2 import QtNetwork
 
 from utils.client import Client
 from utils import custom_widgets as cw
@@ -113,7 +112,8 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
 
         >>> [[message_id, message_content, message_sender_id,
         ...   message_receiver_id, message_attachment, message_readed,
-        ...   message_timestamp, message_sender_id, message_sender_username]]
+        ...   message_timestamp, message_software, message_sender_id,
+        ...   message_sender_username]]
 
         :param data: The data from the server
         :type data: list
@@ -121,7 +121,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         for message in data:
             dt_object = datetime.fromtimestamp(message[6])
             item = cw.TreeWidgetItem(
-                parent=self.trw_mailbox, text=[message[8], str(dt_object)],
+                parent=self.trw_mailbox, text=[message[9], str(dt_object)],
                 message_id=message[0], content= message[1],
                 attachment=message[4], readed=message[5], checkable=True)
             self.trw_mailbox.addTopLevelItem(item)
@@ -159,6 +159,7 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
                 'content': self.txe_chat_view.toPlainText(),
                 'attachment':attachement,
                 'receiver': to,
+                'software': self.software,
                 }
         command = {'command': 'new_message', 'data': data}
         self._send_data(data=command)
@@ -260,6 +261,11 @@ class MainWindow(QtWidgets.QMainWindow, main_ui.Ui_MainWindow):
         delete_selected = menu.addAction('Delete selected messages.')
         delete_selected.triggered.connect(self.delete_messages)
         menu.exec_(QtGui.QCursor.pos())
+
+    def closeEvent(self, event):
+        """This method is called when the app is close"""
+        # Close gracefully the client
+        self.client_manager.client.close()
 
 
 if __name__ == "__main__":

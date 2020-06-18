@@ -12,6 +12,7 @@ CREATE TABLE message
     message_receiver INTEGER,
     message_attachment TEXT NOT NULL,
     message_readed INTEGER,
+    message_software TEXT,
     message_timestamp INTEGER,
 
     FOREIGN KEY (message_sender)
