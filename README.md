@@ -37,13 +37,20 @@ You can also extend this tool in other software by creating a new attachment mod
 4. Use the package manager [pip](https://pip.pypa.io/en/stable/) to install requirements.txt.
 
     ```bash
-    pip install -r requirements.txt
+    $ pip install -r requirements.txt
     ```
+5. Open shell and create the database.db:
 
-5. Run the server.py. Set the host and the port (by default: 127.0.0.1:1302)
+   ```bash
+    $ cd server/db
+    $ sqlite3 database.db
+    ```
+6. Copy the content of commands.txt in the previous shell with sqlite3.
+
+7. Run the server.py. Set the host and the port (by default: 127.0.0.1:1302)
 
     ```bash
-    python server.py --host 127.0.0.1 --port 1302
+    $ python server.py --host 127.0.0.1 --port 1302
     ```
 
 ## Usage for Maya
